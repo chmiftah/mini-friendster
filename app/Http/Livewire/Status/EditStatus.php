@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Livewire\Status;
+
+use Livewire\Component;
+use App\Models\Status;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
+class EditStatus extends Component
+{
+    use AuthorizesRequests;
+    public $status;
+    public $body;
+
+    public function mount ($hash)
+    {
+        $this->status= Status::where('hash', $hash)->firstOrFail();
+        $this->body = $this->status->body;
+
+    }
+    public function update()
+    {
+        $this->authorize('update', $this->status);
+        $this->status->update([
+            'body'=>$this->body,
+        ]);
+        return redirect()->route('status.show', $this->status->hash);
+    }
+    public function render()
+    {
+        $this->authorize('update', $this->status);
+        return view('livewire.status.edit-status')->extends('layouts.app');
+    }
+}
